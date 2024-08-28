@@ -9,11 +9,15 @@ import UIKit
 
 class BooksViewController: UIViewController {
 
+  var books = [Book]()
+  var collectionView: UICollectionView!
+
   override func viewDidLoad() {
     super.viewDidLoad()
     // Do any additional setup after loading the view.
 
     configureViewController()
+    configureCollectionView()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -28,9 +32,49 @@ class BooksViewController: UIViewController {
 
 
   func fetchBooks() {
-    ContentService.shared.fetchBooks { books in
-      print(books)
+    ContentService.shared.fetchBooks { [weak self] books in
+      guard let self = self else { return }
+      self.books = books
+      DispatchQueue.main.async {
+        self.collectionView.reloadData()
+      }
     }
+  }
+}
+
+// Collection view
+extension BooksViewController: UICollectionViewDataSource {
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return books.count
+  }
+
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BookCollectionViewCell.reuseId, for: indexPath) as! BookCollectionViewCell
+    let book = books[indexPath.row]
+    cell.setupPoster(book.cover)
+    return cell
+  }
+
+  func configureCollectionView() {
+    collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: configureFlowLayout())
+    collectionView.translatesAutoresizingMaskIntoConstraints = false
+    collectionView.dataSource = self
+    collectionView.register(BookCollectionViewCell.self, forCellWithReuseIdentifier: BookCollectionViewCell.reuseId)
+    view.addSubview(collectionView)
+  }
+
+  func configureFlowLayout() -> UICollectionViewFlowLayout {
+    let width = view.bounds.width
+    let padding: CGFloat = 12
+    let minimumItemSpacing: CGFloat = 15
+    let availableWidth = width - (2 * padding) - minimumItemSpacing
+    let itemWidth = availableWidth / 2
+
+    let flowLayout = UICollectionViewFlowLayout()
+    flowLayout.sectionInset = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
+    flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth + 50)
+
+    return flowLayout
   }
 }
 
