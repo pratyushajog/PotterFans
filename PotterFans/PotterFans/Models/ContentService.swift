@@ -4,6 +4,9 @@
 //
 //  Created by Pratyusha Joginipally on 8/27/24.
 //
+// Used the open source API project: https://github.com/fedeperin/potterapi
+// for building this app.
+//
 
 import Foundation
 
