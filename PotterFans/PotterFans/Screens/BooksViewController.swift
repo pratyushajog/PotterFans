@@ -14,7 +14,6 @@ class BooksViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Do any additional setup after loading the view.
 
     configureViewController()
     configureCollectionView()
@@ -25,7 +24,7 @@ class BooksViewController: UIViewController {
   }
 
   func configureViewController() {
-    title = "All Books"
+    title = "Bookshelf"
     navigationController?.navigationBar.prefersLargeTitles = false
     view.backgroundColor = .white
   }
@@ -59,6 +58,7 @@ extension BooksViewController: UICollectionViewDataSource {
     collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: configureFlowLayout())
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.dataSource = self
+    collectionView.delegate = self
     collectionView.register(BookCollectionViewCell.self, forCellWithReuseIdentifier: BookCollectionViewCell.reuseId)
     view.addSubview(collectionView)
   }
@@ -75,6 +75,18 @@ extension BooksViewController: UICollectionViewDataSource {
     flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth + 50)
 
     return flowLayout
+  }
+}
+
+// Collection view delegate
+extension BooksViewController: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    let book = books[indexPath.row]
+
+    let bookVC = BookViewController()
+    bookVC.book = book
+    let navController = UINavigationController(rootViewController: bookVC)
+    present(navController, animated: true)
   }
 }
 
